@@ -1,0 +1,174 @@
+tic
+rng('shuffle');
+
+%% Parameters Setting
+
+%--- General
+Nt = 2e5; %number of samples in a run, better not go beyond 5e5, otherwise the computer might hang
+Nrun = 50; %number of runs in a trial
+GetCorp = 0; %choice to save the sample, 1 for both the sample and the 
+             %acceptance rate, 0 for only the acceptance rate
+
+NT = Nrun*Nt; %total number of reference sample points
+
+nq = 3; % # of qubits
+d = 2^nq; % for qubits only, if qutrit, modified d and pom acoordingly
+m = d;
+np = d^2;
+pom = buildNTetraPOM(nq); % the default measurement is multiple tetrahedron
+% pop = [2,2,2,2]; % target posterior
+% pop = [10,20,25,45];
+% pop = [10; 4; 6; 4; 7; 6; 5; 6; 5; 6; 10; 6; 5; 6; 8; 6]';
+
+%  pow = 2;
+%  pop = ones(1,np)*pow; % column of np probabilities
+
+pop = [36,13,64,71,14,16,7,15,60,10,84,63,64,9,55,71,8,12,10,16,16,48,67,62,9,64,75,63,10,74,60,73,65,14,62,66,9,57,76,53,82,78,128,22,61,44,25,27,56,12,52,66,14,76,56,78,45,47,22,27,66,68,25,102];
+
+
+%--- Reference Distribution
+kappa_w = 0.6; %percentage of Wishart-shifted points
+n_w = 90; 
+
+kappa_s = 0.; %percentage of linearly-shifted points
+n_s = 80;
+
+lambso = 0.6; %the 'distance' between the origin and the ref peak before linear shift, 
+% 0 meaning the ref peak is at the origin, 1 at MLE
+lambs = 0.95; %to which place the ref sample is shifted, 1 being MLE, 0 being origin
+
+lambp = 0.95; %the 'distance' between the origin and the Wishart ref peak, 
+% 0 meaning the Wishart ref peak is at the origin, 1 at MLE
+
+
+%% Sampling Procedure
+
+%--- MLE
+np = d^2;
+shift = pop/sum(pop);
+% pomr = getTransMv2(pom);
+% TransM = getTransM(pom);
+% rc = pomr\shift.';
+% rhop = reshape(rc,d,d);
+
+rhop = prob2Rho(shift,pom);
+v = eig(rhop);
+
+if sum(v<0)
+    fprintf('linear inversion not physical, mle running \n');
+    rhomle = qse_apg(pom,shift');
+    fprintf('mle done \n');
+    rhop = lambp*rhomle+(1-lambp)*eye(d)/d;   
+    ppeak = rho2Prob(rhomle,pom)';
+    %-- o. peak for the shifted ref
+    rhopso = rhomle*lambso+(1-lambso)*eye(d)/d;
+    rhops = rhomle*lambs+(1-lambs)*eye(d)/d;
+else
+    rhopso = rhop*lambso+(1-lambso)*eye(d)/d;
+    rhops = rhop*lambs+(1-lambs)*eye(d)/d; 
+    ppeak = rho2Prob(rhop,pom)';
+end  
+    
+logLpeak = sum(pop.*log(ppeak));
+    
+
+%% --- Resampling
+
+%for etak = 1:5
+%    kappa_s = 0.1*(etak-1)+0.0;
+
+%for etan = 1:5
+%    n_s = 8+etan;
+
+Nw = ceil(Nt*kappa_w);
+Ns = floor(Nt*kappa_s);
+Nb = Nt-Nw-Ns;
+kappa = 1 - kappa_w - kappa_s;
+
+lalall = zeros(Nt,Nrun);
+corpall = zeros(d^2,Nt,Nrun);
+pNt = zeros(Nrun,1);
+    
+parfor nrunk = 1:Nrun
+%     for nrunk = 1:Nrun
+
+    %-- obtaining the ref sam
+    [corp,rhos,num_phys,Sigma_w,Sigma_s] = genRefSam(n_w,n_s,Nw,Ns,Nt,d,rhop,rhopso,rhops,pom);
+    %corp/rhos returns the sample in the p/rho-space
+    %CVM are the convariance matrices
+    %indunph records the index of the points that could only be from 
+    %the Wishart but not the linear shift part so that the resampling
+    %ratio can be calculated correctly
+    CVMin = eye(m) / Sigma_w;
+    CVMins = eye(m) / Sigma_s;
+
+
+    %-- calculation of the reference probability of the points
+   ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w,n_s,Sigma_s,rhopso,rhops);
+%     ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w);
+
+    %-- calculation of the target probability of the points
+    lfx = calTarProb(rhos,pop,pom);
+
+    %-- the acceptance ratio in log is "lal"
+    lrx = log(ref_prob);
+    lal = lfx - lrx;
+
+    lalall(:,nrunk) = lal;
+    corpall(:,:,nrunk) = corp;
+end
+
+%-- extracting the physical points from the array with larger dimension
+% tNt = sum(pNt); %total number of physical points in the reference sample
+% lalcomb = zeros(1,tNt);
+% corpcomb = zeros(np,tNt);
+% cpNt = [0;pNt];
+% tpNt = cumsum(cpNt);
+% for nrunk = 1:Nrun
+%     lalcomb(tpNt(nrunk)+1:tpNt(nrunk+1)) = lalall(1:cpNt(nrunk+1),nrunk);
+%     corpcomb(:,tpNt(nrunk)+1:tpNt(nrunk+1)) = corpall(:,1:cpNt(nrunk+1),nrunk);
+% end
+
+% %-- if the actual sample is required, corp needs to be saved
+% if GetCorp == 1
+%     save([savdirT 'Corp' num2str(nq) 'qb' 'Tr',num2str(Ntrialk) '.mat'],'corpcomb','lalcomb','tNt','-v7.3');
+% end
+% lalcombda = [lalcombda,lalcomb];
+toc
+
+
+
+lallin = lalall(:);
+[lalcombdam,inal] = max(lallin);
+corpalllin = reshape(corpall,[np,NT]);
+ldraw = log(rand(size(lallin)));
+acc = ldraw< (lallin-lalcombdam);
+corpacc = corpalllin(:,acc);
+ar = size(corpacc,2)/NT;
+
+% if GetCorp == 1
+%     for Ntrialk = 1:Ntrial
+%         load([savdirT 'Corp' num2str(nq) 'qb' 'Tr',num2str(Ntrialk) '.mat']);
+%         lalcomb = lalcomb-lalcombdam;
+%         ldraw = log(rand(size(lalcomb)));
+%         acc = ldraw<lalcomb;
+%         corpacc = [corpacc, corpcomb(:,acc)];
+%     end
+%     ar = size(corpacc,2)/NT;
+%     save([savdirR 'Corp' num2str(nq) 'qb' 'Nc' num2str(n_s) 'kappa_s' num2str(kappa_s) 'Ntr' num2str(Ntrial) '.mat'],'corpacc','ar','-v7.3');
+% else 
+%     ldraw2 = log(rand(size(lalcombda)));
+%     ar = sum(ldraw2 < (lalcombda-lalcombdam))/NT;
+% end
+
+toc
+%AR(etan) = ar;
+%end
+
+
+%%
+%{
+figure
+x=1:1:etak;
+plot((x-1)*0.1,AR(:,x),'-o')
+%}
