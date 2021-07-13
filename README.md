@@ -1,5 +1,7 @@
 # QSam
-Generation of samples of quantum states according to target posterior 
+Generation of samples of quantum states according to target posterior according to the method outlined in 
+*Uncorrelated problem-specific samples of quantum states from zero-mean Wishart distributions* by *R. Han et al.* 
+([arXiv:2106.08533](https://arxiv.org/abs/2106.08533)). 
 
 **bold**
 *italic*
@@ -35,18 +37,17 @@ To generate a sample, one only needs to supply the appropriate parameters in the
 - [x] d -> m
 - [x] etaw -> kappa_w
 - [x] etas -> kappa_s
-- [] etab -> kappa
-- [] CVM -> Sigma
-- [] A -> Psi
+- [x] etab -> kappa
+- [x] CVM -> Sigma
+- [x] A -> Psi
 - [x] Ncolw -> n_w
 - [x] Ncols -> n_s
-- [] rhop -> rho_peak
-- [] TransM -> 
-- [] kra -> A 
-- [] corp -> prob_points
-- [] minlogx -> min_log_lambda
-- [] maxlogx -> max_log_lambda
-- [] dellogx -> log_lambda_step
+- [x] rhop -> rho_peak
+- [x] kra -> A 
+- [x] corp -> prob_points
+- [x] minlogx -> min_log_lambda
+- [x] maxlogx -> max_log_lambda
+- [x] dellogx -> log_lambda_step
 
 ## qMLE
 https://github.com/qMLE/qMLE

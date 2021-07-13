@@ -1,4 +1,4 @@
-function [rho,Sigma] = genWishartSam(N,rhop,n_w)
+function [rho,Sigma] = genWishartSam(N,rho_peak,n_w)
     % 
     % This generates a uniform sample in m dimension with N points. If one 
     % has a specific POM in mind, one can set prob_opt to be true and have the
@@ -21,9 +21,9 @@ function [rho,Sigma] = genWishartSam(N,rhop,n_w)
     % 
     % 
     
-    m = size(rhop,1);
-    Sigma = calSigma(n_w,rhop);
-    kra = mpower(Sigma,1/2);
+    m = size(rho_peak,1);
+    Sigma = calSigma(n_w,rho_peak);
+    A = mpower(Sigma,1/2);
 
     Psi_real = randn([m,n_w,N]); 
     Psi_imag = randn([m,n_w,N]); 
@@ -33,7 +33,7 @@ function [rho,Sigma] = genWishartSam(N,rhop,n_w)
     
     for n_dx = 1 : N
        rhotemp = Psi(:,:,n_dx) * (Psi(:,:,n_dx))' ; 
-       rhotemp =  kra * rhotemp * kra;
+       rhotemp =  A * rhotemp * A;
        rhotemp = rhotemp / trace(rhotemp); 
        rho(:,:,n_dx) = rhotemp;
     end

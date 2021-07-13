@@ -20,6 +20,6 @@ lambp = 0.95; %the 'distance' between the origin and the Wishart ref peak,
 % Target posterior counts
 pop = 10 * [10, 4, 6, 4, 7, 6, 5, 6, 5, 6, 10, 6, 5, 6, 8, 6];
 
-% corpacc contains the output target sample and ar is the acceptance rate.
-[corpacc,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kappa_s,n_s,lambso,lambs);
+% prob_points_accepted contains the output target sample and ar is the acceptance rate.
+[prob_points_accepted,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kappa_s,n_s,lambso,lambs);
 toc

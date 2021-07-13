@@ -1,13 +1,13 @@
-function cred_lambda = calCred(pop,corp,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda)
+function cred_lambda = calCred(pop,prob_points,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda)
     % 
     % This calculates the credibility in the samples in the probability space, 
-    % given in 'corp' for range of the log of lambda from min_log_lambda to 
+    % given in 'prob_points' for range of the log of lambda from min_log_lambda to 
     % max_log_lambda in steps of log_lambda_step
     % 
     % Input
     % --------------------------------------------------------------------------
     % n : int
-    %   # of columns of the A matrix used in construction of the Wishart sample
+    %   # of columns of the Psi matrix used in construction of the Wishart sample
     % rho_peak : array of complex double
     %   peak of the Wishart sample
     % 
@@ -22,7 +22,7 @@ function cred_lambda = calCred(pop,corp,logLpeak,log_lambda_step,min_log_lambda,
     % pop is given in a row
     % Each point of Corp is given in a column
     % extract the number of 
-    N = size(corp,2);
+    N = size(prob_points,2);
 
     % calculate the log of lambdas
     log_lambdas = min_log_lambda:log_lambda_step:max_log_lambda;
@@ -37,7 +37,7 @@ function cred_lambda = calCred(pop,corp,logLpeak,log_lambda_step,min_log_lambda,
     % This element-wise multiplication calculates the log of (the power of 
     % the probabilities), and thus the sum gives the log of the likelihood as 
     % given in Eqn.(43) 
-    log_likelihood = sum(log(corp).*popl);
+    log_likelihood = sum(log(prob_points).*popl);
     
     % This calculates the credibility according to Eqn.(54) by counting how
     % many points with a likelihood larger than lambda * (maximum likelihood)

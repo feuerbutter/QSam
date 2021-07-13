@@ -1,4 +1,4 @@
-function [log_tar_prob,corp] = calTarProb(rhos,pop,pom)
+function [log_tar_prob,prob_points] = calTarProb(rhos,pop,pom)
     % 
     % This calculates the log of target probability for the case of posterior
     % 
@@ -23,8 +23,8 @@ function [log_tar_prob,corp] = calTarProb(rhos,pop,pom)
     m = size(rhos,1);
     
     % calculate the probabilities, where each sample probability is
-    % returned in a column, hence, corp is a m^2 by N matrix
-    corp = rho2Prob(rhos,pom);
+    % returned in a column, hence, prob_points is a m^2 by N matrix
+    prob_points = rho2Prob(rhos,pom);
     
     % pop is input as a row and popl is N copies of transpose of pop
     popl = repmat(pop',1,N);
@@ -32,7 +32,7 @@ function [log_tar_prob,corp] = calTarProb(rhos,pop,pom)
     
     % This element-wise multiplication calculates the log of (the power of 
     % the probabilities)
-    log_tar_prob = log(corp) .* popl;
+    log_tar_prob = log(prob_points) .* popl;
     
     % The sum gives the log of posterior
     log_tar_prob = sum(log_tar_prob);

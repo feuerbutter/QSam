@@ -1,7 +1,7 @@
-function [rho,num_phys,Sigma] = genShiftedSam(N,rhopso,rhops,n_s)
+function [rho,num_phys,Sigma] = genShiftedSam(N,rho_peak_shift_o,rho_peak_shift,n_s)
     % 
-    % This generates a Wishart sample originally peaked at rhopso and
-    % is shifted to rhops.
+    % This generates a Wishart sample originally peaked at rho_peak_shift_o and
+    % is shifted to rho_peak_shift.
     % 
     % Input
     % --------------------------------------------------------------------------
@@ -19,11 +19,11 @@ function [rho,num_phys,Sigma] = genShiftedSam(N,rhopso,rhops,n_s)
     % 
     % 
     % 
-    m = size(rhopso,1);
-    delrho = rhops-rhopso;
+    m = size(rho_peak_shift_o,1);
+    delrho = rho_peak_shift-rho_peak_shift_o;
 
-    Sigma = calSigma(n_s,rhopso);
-    kra = mpower(Sigma,1/2);
+    Sigma = calSigma(n_s,rho_peak_shift_o);
+    A = mpower(Sigma,1/2);
 
     Psi_real = randn([m,n_s,N]); 
     Psi_imag = randn([m,n_s,N]); 
@@ -35,7 +35,7 @@ function [rho,num_phys,Sigma] = genShiftedSam(N,rhopso,rhops,n_s)
 
     for n_dx = 1 : N
         rhotemp = Psi(:,:,n_dx) * (Psi(:,:,n_dx))' ; 
-        rhotemp =  kra * rhotemp * kra;
+        rhotemp =  A * rhotemp * A;
         rhotemp = rhotemp / trace(rhotemp); 
         rhotemp = rhotemp + delrho;
         if min(real(eig(rhotemp)))<0

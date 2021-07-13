@@ -1,4 +1,4 @@
-function log_w_prob = calWishartProb(rho,Ncol,m,CVMin)
+function log_w_prob = calWishartProb(rho,Ncol,m,inv_Sigma)
     % 
     % This calculates the logarithm of the part of the Wishart probability 
     % that has a dependence on rho according to Eqn.(16)
@@ -20,5 +20,5 @@ function log_w_prob = calWishartProb(rho,Ncol,m,CVMin)
     % 
     % 
     
-    log_w_prob = real((Ncol-m)*log(det(rho))-(Ncol*m)*log(trace(rho*CVMin)));
+    log_w_prob = real((Ncol-m)*log(det(rho))-(Ncol*m)*log(trace(rho*inv_Sigma)));
     

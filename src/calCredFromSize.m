@@ -7,7 +7,7 @@ function cred_from_size = calCredFromSize(size_lambda,log_lambda_step,min_log_la
     % Input
     % --------------------------------------------------------------------------
     % n : int
-    %   # of columns of the A matrix used in construction of the Wishart sample
+    %   # of columns of the Psi matrix used in construction of the Wishart sample
     % rho_peak : array of complex double
     %   peak of the Wishart sample
     % 

@@ -46,22 +46,22 @@ lambp = 0.95; %the 'distance' between the origin and the Wishart ref peak,
 np = m^2;
 ref_freq = pop/sum(pop);
 
-rhop = prob2Rho(ref_freq,pom);
-v = eig(rhop);
+rho_peak = prob2Rho(ref_freq,pom);
+v = eig(rho_peak);
 
 if sum(v<0)
     fprintf('linear inversion not physical, mle running \n');
     rhomle = qse_apg(pom,ref_freq');
     fprintf('mle done \n');
-    rhop = lambp*rhomle+(1-lambp)*eye(m)/m;   
+    rho_peak = lambp*rhomle+(1-lambp)*eye(m)/m;   
     ppeak = rho2Prob(rhomle,pom)';
     %-- o. peak for the shifted ref
-    rhopso = rhomle*lambso+(1-lambso)*eye(m)/m;
-    rhops = rhomle*lambs+(1-lambs)*eye(m)/m;
+    rho_peak_shift_o = rhomle*lambso+(1-lambso)*eye(m)/m;
+    rho_peak_shift = rhomle*lambs+(1-lambs)*eye(m)/m;
 else
-    rhopso = rhop*lambso+(1-lambso)*eye(m)/m;
-    rhops = rhop*lambs+(1-lambs)*eye(m)/m; 
-    ppeak = rho2Prob(rhop,pom)';
+    rho_peak_shift_o = rho_peak*lambso+(1-lambso)*eye(m)/m;
+    rho_peak_shift = rho_peak*lambs+(1-lambs)*eye(m)/m; 
+    ppeak = rho2Prob(rho_peak,pom)';
 end  
     
 logLpeak = sum(pop.*log(ppeak));
@@ -75,33 +75,33 @@ Nb = Nt-Nw-Ns;
 kappa = 1 - kappa_w - kappa_s;
 
 lalall = zeros(Nt,Nrun);
-corpall = zeros(m^2,Nt,Nrun);
+prob_points_total = zeros(m^2,Nt,Nrun);
 pNt = zeros(Nrun,1);
     
 for nrunk = 1:Nrun
 %     for nrunk = 1:Nrun
 
     %-- obtaining the ref sam
-    [rhos,num_phys,Sigma_w,Sigma_s] = genRefSam(n_w,n_s,Nw,Ns,Nt,m,rhop,rhopso,rhops);
-    %corp/rhos returns the sample in the p/rho-space
-    %CVM are the convariance matrices
+    [rhos,num_phys,Sigma_w,Sigma_s] = genRefSam(n_w,n_s,Nw,Ns,Nt,m,rho_peak,rho_peak_shift_o,rho_peak_shift);
+    %prob_points/rhos returns the sample in the p/rho-space
+    %Sigma are the convariance matrices
     %indunph records the index of the points that could only be from 
     %the Wishart but not the linear shift part so that the resampling
     %ratio can be calculated correctly
 
     %-- calculation of the reference probability of the points
-    ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w,n_s,Sigma_s,rhopso,rhops);
+    ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w,n_s,Sigma_s,rho_peak_shift_o,rho_peak_shift);
 %     ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w);
 
     %-- calculation of the target probability of the points
-    [lfx,corp] = calTarProb(rhos,pop,pom);
+    [lfx,prob_points] = calTarProb(rhos,pop,pom);
 
     %-- the acceptance ratio in log is "lal"
     lrx = log(ref_prob);
     lal = lfx - lrx;
 
     lalall(:,nrunk) = lal;
-    corpall(:,:,nrunk) = corp;
+    prob_points_total(:,:,nrunk) = prob_points;
 end
 
 toc
@@ -110,11 +110,11 @@ toc
 
 lallin = lalall(:);
 [lalcombdam,inal] = max(lallin);
-corpalllin = reshape(corpall,[np,NT]);
+prob_points_total_lin = reshape(prob_points_total,[np,NT]);
 ldraw = log(rand(size(lallin)));
 acc = ldraw < (lallin-lalcombdam);
-corpacc = corpalllin(:,acc);
-ar = size(corpacc,2)/NT;
+prob_points_accepted = prob_points_total_lin(:,acc);
+ar = size(prob_points_accepted,2)/NT;
 toc
 
 %-----Plotting
@@ -123,11 +123,11 @@ min_log_lambda = -20;
 max_log_lambda = 0;
 
 N_size_uni = 1e7;
-corpu = genUniSam(N_size_uni,m);
-corpu = rho2Prob(corpu,pom);
-size_lambda = calCred(pop,corpu,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda);
+prob_points_uniform = genUniSam(N_size_uni,m);
+prob_points_uniform = rho2Prob(prob_points_uniform,pom);
+size_lambda = calCred(pop,prob_points_uniform,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda);
 cred_from_size = calCredFromSize(size_lambda,log_lambda_step,min_log_lambda,max_log_lambda);
-cred_lambda = calCred(pop,corpacc,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda);
+cred_lambda = calCred(pop,prob_points_accepted,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda);
 
 %------Plotting for verification
 plotCS(cred_from_size,log_lambda_step,min_log_lambda,max_log_lambda)

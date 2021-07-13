@@ -1,4 +1,4 @@
-function log_w_norm = calWishartNorm(Ncol,m,CVMin)
+function log_w_norm = calWishartNorm(Ncol,m,inv_Sigma)
     % 
     % This calculates the logarithm of the part of the Wishart probability 
     % that is independent of rho according to Eqn.(16), which is essentially
@@ -23,4 +23,4 @@ function log_w_norm = calWishartNorm(Ncol,m,CVMin)
     
     gl = gammaln(Ncol+1-(1:m));
     
-    log_w_norm = gammaln(Ncol*m) - m * (m-1) / 2 * log(pi) - sum(gl) + Ncol * log(real(det(CVMin)));
+    log_w_norm = gammaln(Ncol*m) - m * (m-1) / 2 * log(pi) - sum(gl) + Ncol * log(real(det(inv_Sigma)));

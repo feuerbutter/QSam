@@ -1,4 +1,4 @@
-function [corpacc,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kappa_s,n_s,lambso,lambs)
+function [prob_points_accepted,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kappa_s,n_s,lambso,lambs)
     % 
     % This generates the reference sample and the corresponding
     % probability.
@@ -82,13 +82,13 @@ function [corpacc,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kappa_s,n_s,lamb
     
     for t_dx = 1 : N_trial
         log_ratio_runs = zeros(N_ref_single,N_run);
-        corp_runs = zeros(m^2,N_ref_single,N_run);
+        prob_points_runs = zeros(m^2,N_ref_single,N_run);
 
         parfor nrunk = 1 : N_run
             %-- obtaining the ref sam
             [rhos,~,Sigma_w,Sigma_s] = genRefSam(n_w,n_s,N_w,N_s,N_ref_single,m,rho_peak,rho_peak_so,rho_peak_s);
-            %corp/rhos returns the sample in the p/rho-space
-            %CVM are the convariance matrices
+            %prob_points/rhos returns the sample in the p/rho-space
+            %Sigma are the convariance matrices
             %indunph records the index of the points that could only be from 
             %the Wishart but not the linear shift part so that the resampling
             %ratio can be calculated correctly
@@ -98,42 +98,42 @@ function [corpacc,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kappa_s,n_s,lamb
             ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w,n_s,Sigma_s,rho_peak_so,rho_peak_s);
             
             %-- calculation of the target probability of the points
-            [log_tar_prob,corp] = calTarProb(rhos,pop,pom);
+            [log_tar_prob,prob_points] = calTarProb(rhos,pop,pom);
 
             %-- the acceptance ratio in log is "lal"
             log_ref_prob = log(ref_prob);
             log_ratio = log_tar_prob - log_ref_prob;
 
             log_ratio_runs(:,nrunk) = log_ratio;
-            corp_runs(:,:,nrunk) = corp;
+            prob_points_runs(:,:,nrunk) = prob_points;
         end
 
         log_ratio_trial = log_ratio_runs(:);
         [log_ratio_max(t_dx),~] = max(log_ratio_trial);
-        corp_trial = reshape(corp_runs,[m^2,N_total]);
+        prob_points_trial = reshape(prob_points_runs,[m^2,N_total]);
 
         if N_trial > 1
             % If the original N_total are splitted into different 
-            save([save_dir 'temp_data',num2str(t_dx) '.mat'],'corp_trial','log_ratio_trial','-v7.3');
+            save([save_dir 'temp_data',num2str(t_dx) '.mat'],'prob_points_trial','log_ratio_trial','-v7.3');
         else
             ldraw = log(rand(size(log_ratio_trial)));
             acc = ldraw < (log_ratio_trial-log_ratio_max);
-            corpacc = corp_trial(:,acc);
-            ar = size(corpacc,2) / N_total;
+            prob_points_accepted = prob_points_trial(:,acc);
+            ar = size(prob_points_accepted,2) / N_total;
         end
     end
 
     if N_trial > 1
         [log_ratio_max,~] = max(log_ratio_max);
-        corpacc = [];
+        prob_points_accepted = [];
         for t_dx = 1 : N_trial
             load([save_dir 'temp_data',num2str(t_dx) '.mat']);
             ldraw = log(rand(size(log_ratio_trial)));
             acc = ldraw < (log_ratio_trial-log_ratio_max);
-            corpacc = [corpacc,corp_trial(:,acc)];
+            prob_points_accepted = [prob_points_accepted,prob_points_trial(:,acc)];
             delete([save_dir 'temp_data',num2str(t_dx) '.mat']);
         end
-        ar = size(corpacc,2) / N_total_ori;
+        ar = size(prob_points_accepted,2) / N_total_ori;
     end
 
 
