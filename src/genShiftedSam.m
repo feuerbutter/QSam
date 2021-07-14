@@ -1,17 +1,16 @@
 function [rho,num_phys,Sigma] = genShiftedSam(N,rho_peak_shift_o,rho_peak_shift,n_s)
     % 
-    % This generates a Wishart sample originally peaked at rho_peak_shift_o and
-    % is shifted to rho_peak_shift.
-    % 
+    % This function generates a Wishart sample that is peaked at rho_peak 
+    % and has N sample points using Psi matrices with n_w columns.
     % Input
     % --------------------------------------------------------------------------
     % N : int
     %   # of sample points generated
-    % m : int
-    %   dimension of the system, e.g. 2^k for k qubits
-    % varargin : arrays of complex
-    %   POM is supplied as an optional variable
-    % 
+    % rho_peak : m*m array of complex
+    %   peak of the Wishart distribuion
+    % n_w : int
+    %   # of columns of the Psi matrices in constructing the density
+    %   matrices
     % 
     % Output
     % --------------------------------------------------------------------------
@@ -19,6 +18,7 @@ function [rho,num_phys,Sigma] = genShiftedSam(N,rho_peak_shift_o,rho_peak_shift,
     % 
     % 
     % 
+    
     m = size(rho_peak_shift_o,1);
     delrho = rho_peak_shift-rho_peak_shift_o;
 

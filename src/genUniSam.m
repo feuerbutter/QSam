@@ -1,8 +1,6 @@
 function rho = genUniSam(N,m)
     % 
-    % This generates a uniform sample in m dimension with N points. If one 
-    % has a specific POM in mind, one can set prob_opt to be true and have the
-    % points in the probability space returned as well.
+    % This generates a uniform sample in m dimension with N points.
     % 
     % Input
     % --------------------------------------------------------------------------
@@ -10,8 +8,6 @@ function rho = genUniSam(N,m)
     %   # of sample points generated
     % m : int
     %   dimension of the system, e.g. 2^k for k qubits
-    % varargin : arrays of complex
-    %   POM is supplied as an optional variable
     % 
     % 
     % Output

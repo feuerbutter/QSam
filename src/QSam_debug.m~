@@ -49,24 +49,24 @@ shift = pop/sum(pop);
 % pomr = getTransMv2(pom);
 % TransM = getTransM(pom);
 % rc = pomr\shift.';
-% rhop = reshape(rc,d,d);
+% rho_peak = reshape(rc,d,d);
 
-rhop = prob2Rho(shift,pom);
-v = eig(rhop);
+rho_peak = prob2Rho(shift,pom);
+v = eig(rho_peak);
 
 if sum(v<0)
     fprintf('linear inversion not physical, mle running \n');
     rhomle = qse_apg(pom,shift');
     fprintf('mle done \n');
-    rhop = lambp*rhomle+(1-lambp)*eye(d)/d;   
+    rho_peak = lambp*rhomle+(1-lambp)*eye(d)/d;   
     ppeak = rho2Prob(rhomle,pom)';
     %-- o. peak for the shifted ref
-    rhopso = rhomle*lambso+(1-lambso)*eye(d)/d;
-    rhops = rhomle*lambs+(1-lambs)*eye(d)/d;
+    rho_peak_shift_o = rhomle*lambso+(1-lambso)*eye(d)/d;
+    rho_peak_shift = rhomle*lambs+(1-lambs)*eye(d)/d;
 else
-    rhopso = rhop*lambso+(1-lambso)*eye(d)/d;
-    rhops = rhop*lambs+(1-lambs)*eye(d)/d; 
-    ppeak = rho2Prob(rhop,pom)';
+    rho_peak_shift_o = rho_peak*lambso+(1-lambso)*eye(d)/d;
+    rho_peak_shift = rho_peak*lambs+(1-lambs)*eye(d)/d; 
+    ppeak = rho2Prob(rho_peak,pom)';
 end  
     
 logLpeak = sum(pop.*log(ppeak));
@@ -86,25 +86,25 @@ Nb = Nt-Nw-Ns;
 kappa = 1 - kappa_w - kappa_s;
 
 lalall = zeros(Nt,Nrun);
-corpall = zeros(d^2,Nt,Nrun);
+prob_points_total = zeros(d^2,Nt,Nrun);
 pNt = zeros(Nrun,1);
     
 parfor nrunk = 1:Nrun
 %     for nrunk = 1:Nrun
 
     %-- obtaining the ref sam
-    [corp,rhos,num_phys,Sigma_w,Sigma_s] = genRefSam(n_w,n_s,Nw,Ns,Nt,d,rhop,rhopso,rhops,pom);
-    %corp/rhos returns the sample in the p/rho-space
-    %CVM are the convariance matrices
+    [prob_points,rhos,num_phys,Sigma_w,Sigma_s] = genRefSam(n_w,n_s,Nw,Ns,Nt,d,rho_peak,rho_peak_shift_o,rho_peak_shift,pom);
+    %prob_points/rhos returns the sample in the p/rho-space
+    %Sigma are the convariance matrices
     %indunph records the index of the points that could only be from 
     %the Wishart but not the linear shift part so that the resampling
     %ratio can be calculated correctly
-    CVMin = eye(m) / Sigma_w;
-    CVMins = eye(m) / Sigma_s;
+    inv_Sigma = eye(m) / Sigma_w;
+    inv_Sigma_s = eye(m) / Sigma_s;
 
 
     %-- calculation of the reference probability of the points
-   ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w,n_s,Sigma_s,rhopso,rhops);
+   ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w,n_s,Sigma_s,rho_peak_shift_o,rho_peak_shift);
 %     ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma_w);
 
     %-- calculation of the target probability of the points
@@ -115,23 +115,23 @@ parfor nrunk = 1:Nrun
     lal = lfx - lrx;
 
     lalall(:,nrunk) = lal;
-    corpall(:,:,nrunk) = corp;
+    prob_points_total(:,:,nrunk) = prob_points;
 end
 
 %-- extracting the physical points from the array with larger dimension
 % tNt = sum(pNt); %total number of physical points in the reference sample
 % lalcomb = zeros(1,tNt);
-% corpcomb = zeros(np,tNt);
+% prob_pointscomb = zeros(np,tNt);
 % cpNt = [0;pNt];
 % tpNt = cumsum(cpNt);
 % for nrunk = 1:Nrun
 %     lalcomb(tpNt(nrunk)+1:tpNt(nrunk+1)) = lalall(1:cpNt(nrunk+1),nrunk);
-%     corpcomb(:,tpNt(nrunk)+1:tpNt(nrunk+1)) = corpall(:,1:cpNt(nrunk+1),nrunk);
+%     prob_pointscomb(:,tpNt(nrunk)+1:tpNt(nrunk+1)) = prob_points_total(:,1:cpNt(nrunk+1),nrunk);
 % end
 
-% %-- if the actual sample is required, corp needs to be saved
+% %-- if the actual sample is required, prob_points needs to be saved
 % if GetCorp == 1
-%     save([savdirT 'Corp' num2str(nq) 'qb' 'Tr',num2str(Ntrialk) '.mat'],'corpcomb','lalcomb','tNt','-v7.3');
+%     save([savdirT 'Corp' num2str(nq) 'qb' 'Tr',num2str(Ntrialk) '.mat'],'prob_pointscomb','lalcomb','tNt','-v7.3');
 % end
 % lalcombda = [lalcombda,lalcomb];
 toc
@@ -140,11 +140,11 @@ toc
 
 lallin = lalall(:);
 [lalcombdam,inal] = max(lallin);
-corpalllin = reshape(corpall,[np,NT]);
+prob_points_total_lin = reshape(prob_points_total,[np,NT]);
 ldraw = log(rand(size(lallin)));
 acc = ldraw< (lallin-lalcombdam);
-corpacc = corpalllin(:,acc);
-ar = size(corpacc,2)/NT;
+prob_points_accepted = prob_points_total_lin(:,acc);
+ar = size(prob_points_accepted,2)/NT;
 
 % if GetCorp == 1
 %     for Ntrialk = 1:Ntrial
@@ -152,10 +152,10 @@ ar = size(corpacc,2)/NT;
 %         lalcomb = lalcomb-lalcombdam;
 %         ldraw = log(rand(size(lalcomb)));
 %         acc = ldraw<lalcomb;
-%         corpacc = [corpacc, corpcomb(:,acc)];
+%         prob_points_accepted = [prob_points_accepted, prob_pointscomb(:,acc)];
 %     end
-%     ar = size(corpacc,2)/NT;
-%     save([savdirR 'Corp' num2str(nq) 'qb' 'Nc' num2str(n_s) 'kappa_s' num2str(kappa_s) 'Ntr' num2str(Ntrial) '.mat'],'corpacc','ar','-v7.3');
+%     ar = size(prob_points_accepted,2)/NT;
+%     save([savdirR 'Corp' num2str(nq) 'qb' 'Nc' num2str(n_s) 'kappa_s' num2str(kappa_s) 'Ntr' num2str(Ntrial) '.mat'],'prob_points_accepted','ar','-v7.3');
 % else 
 %     ldraw2 = log(rand(size(lalcombda)));
 %     ar = sum(ldraw2 < (lalcombda-lalcombdam))/NT;

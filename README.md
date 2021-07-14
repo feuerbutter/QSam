@@ -25,8 +25,15 @@ or
 2. sth
 
 ## Running of Codes
-To generate a sample, one only needs to supply the appropriate parameters in the script, *main.m*, such as the posterior.
+To generate a sample, one only needs to supply the appropriate parameters in the script, *main.m*. One needs to adjust the various properties of the reference sample, such as the composition percentage of the Wishart sample, and to specify the posterior for the target sample. The target sample points are then collected in the variable *prob_points_accepted* and the acceptance rate is given in thevariable in *ar*. 
 
+One is advised to first begin with a relatively small *N_total*, e.g. 1e4 or 1e5, and play with the reference sample parameters to achieve a considerably efficient acceptance rate before generating a large target sample.
+
+The sample produced is probabilities in the probability simplex, and it could be transformed into density matrices in the state space by
+```
+rho = prob2Rho(prob,POM)
+```
+ 
 ## Utility Functions
 - genRefSam : used to generate reference sample
 
