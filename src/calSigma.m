@@ -12,9 +12,12 @@ function Sigma = calSigma(n,rho_peak)
     % 
     % Output
     % --------------------------------------------------------------------------
+    % Sigma : array of double
+    %   the covariance matrix required to produce the peaked Wishart sample
     % 
-    % 
-    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % see genTarSam.m
     % 
 
     m = size(rho_peak,1);

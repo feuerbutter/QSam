@@ -1,21 +1,35 @@
 function ref_prob = calRefProb(rhos,kappa,kappa_w,n_w,Sigma,varargin)
     % 
-    % This calculates the referenc probability 
+    % This calculates the reference probability according to Eqn.(16)
     % 
     % 
     % Input
     % --------------------------------------------------------------------------
-    % N : int
-    %   # of sample points generated
-    % m : int
-    %   dimension of the system, e.g. 2^k for k qubits
-    % varargin : arrays of complex
-    %   POM is supplied as an optional variable
+    % rhos : 3d array of comnplex double
+    %   sample points in the state space
+    % kappa : double
+    %   percentage of uniform sample
+    % kappa_w : double
+    %   percentage of Wishart sample
+    % n_w : int   
+    %   # of columns of the Psi matrix used in construction of the Wishart sample
+    % Sigma : array of double
+    %   the covariance matrix required to produce the peaked Wishart sample
+    % varargin : 4 additional optional parameters to include shifted reference sample
+    %   n_s = varargin{1};
+    %   Sigma_s = varargin{2};
+    %   rho_peak_shift_o = varargin{3};
+    %   rho_peak_shift = varargin{4};
     % 
     % 
     % Output
     % --------------------------------------------------------------------------
+    % ref_prob : 1d array of real
+    %   the reference probability of the sample points
     % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % see genTarSam.m
     % 
     % 
     % 

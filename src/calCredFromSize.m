@@ -6,15 +6,24 @@ function cred_from_size = calCredFromSize(size_lambda,log_lambda_step,min_log_la
     % 
     % Input
     % --------------------------------------------------------------------------
-    % n : int
-    %   # of columns of the Psi matrix used in construction of the Wishart sample
-    % rho_peak : array of complex double
-    %   peak of the Wishart sample
+    % size_lambda : 1d array of double
+    %   the size values for all the lambdas
+    % log_lambda_step : double
+    %   the x-axis interval between the points forming the curve
+    % min_log_lambda : double
+    %   the x-axis starting point of the curve
+    % max_log_lambda : double 
+    %   the x-axis ending point of the curve, usually set to 0 = log(1)
     % 
     % 
     % Output
     % --------------------------------------------------------------------------
+    % cred_from_size : 1d array of double
+    %   the theoretical credibility values for all the lambdas
     % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % see main_verification.m
     % 
     % 
     % 

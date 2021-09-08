@@ -12,7 +12,10 @@ function n_tetra_pom = buildNTetraPOM(n_qb)
     % pom : array of real double
     %   tetrahedron pom for n_qb qubits
     % 
-    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % n_qb = 2
+    % n_tetra_pom = buildNTetraPOM(n_qb) % the tensor product of 2 tetrahedron poms to form a pom in the 2 qubits space
     % 
 
 

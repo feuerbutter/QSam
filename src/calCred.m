@@ -1,27 +1,41 @@
 function cred_lambda = calCred(pop,prob_points,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda)
     % 
-    % This calculates the credibility in the samples in the probability space, 
+    % This calculates the credibility curve of the sample points in the probability space, 
     % given in 'prob_points' for range of the log of lambda from min_log_lambda to 
     % max_log_lambda in steps of log_lambda_step
     % 
     % Input
     % --------------------------------------------------------------------------
-    % n : int
-    %   # of columns of the Psi matrix used in construction of the Wishart sample
-    % rho_peak : array of complex double
-    %   peak of the Wishart sample
+    % pop : array of integers
+    %   the power of probabilities for the posterior
+    % prob_points : 3d array of complex double
+    %   sample points in the probability space, e.g. a 2-qubit sample of 1000 points would
+    %   have the dimension of 4x4x1000
+    % logLpeak : double
+    %   the log of the maximum likelihood in the physical space 
+    % log_lambda_step : double
+    %   the x-axis interval between the points forming the curve
+    % min_log_lambda : double
+    %   the x-axis starting point of the curve
+    % max_log_lambda : double 
+    %   the x-axis ending point of the curve, usually set to 0 = log(1)
+    % 
     % 
     % 
     % Output
     % --------------------------------------------------------------------------
+    % cred_lambda : 1d array of double
+    %   the credibility values for all the lambdas
     % 
-    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % see main_verification.m
     % 
     % 
 
     % pop is given in a row
-    % Each point of Corp is given in a column
-    % extract the number of 
+    % Each point of prob_points is given in a column
+    % extract the number of points in the sample
     N = size(prob_points,2);
 
     % calculate the log of lambdas
