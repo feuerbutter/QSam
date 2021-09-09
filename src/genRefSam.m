@@ -12,29 +12,40 @@ function [rhos,num_phys,Sigma_w,Sigma_s] = genRefSam(n_w,n_s,N_w,N_s,N_total,m,r
     %   # of columns of the Psi matrix used in construction of the Wishart sample
     % n_s : int
     %   # of columns of the Psi matrix used in construction of the shifted sample
-    % Nw : int
+    % N_w : int
     %   # of Wishart sample points
-    % Ns : int
+    % N_s : int
     %   # of shifted sample points
-    % Nt : int
-    %   # of total sample points
-    % d : int
+    % N_total : int
+    %   # of sample points generated
+    % m : int
     %   dimension of the system, e.g. 2^k for k qubits
     % rho_peak : array of complex double
     %   peak of the Wishart sample
-    % rho_peak_shift : array of complex double
-    %   the final peak of the shifted sample
     % rho_peak_shift_o : array of complex double
     %   peak of the shifted sample before shifting
-    % 
+    % rho_peak_shift : array of complex double
+    %   the final peak of the shifted sample
     % 
     % Output
     % --------------------------------------------------------------------------
+    % rhos : 3d array of comnplex double
+    %   sample points in the state space
+    % num_phys : int
+    %   # of physical states in the reference sample, only different from the total number of points 
+    %   in the case of a shifted sample
+    % Sigma_w : array of double
+    %   the covariance matrix required to produce the peaked Wishart sample
+    % Sigma_s : array of double
+    %   the covariance matrix required to produce the shifted Wishart sample
+    % 
+    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % see genTarSam.m
     % 
     % 
     % 
-    % 
-
     
     N_uni = N_total-N_w-N_s;
 

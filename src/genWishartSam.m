@@ -1,4 +1,4 @@
-function [rho,Sigma] = genWishartSam(N,rho_peak,n_w)
+function [rhos,Sigma] = genWishartSam(N,rho_peak,n_w)
     % 
     % This function generates a Wishart sample that is peaked at rho_peak 
     % and has N sample points using Psi matrices with n_w columns.
@@ -14,7 +14,8 @@ function [rho,Sigma] = genWishartSam(N,rho_peak,n_w)
     % 
     % Output
     % --------------------------------------------------------------------------
-    % 
+    % rhos : 3d array of comnplex double
+    %   sample points in the state space
     % 
     % 
     % 
@@ -27,12 +28,12 @@ function [rho,Sigma] = genWishartSam(N,rho_peak,n_w)
     Psi_imag = randn([m,n_w,N]); 
     Psi = Psi_real + 1j * Psi_imag;
 
-    rho = zeros(m,m,N);
+    rhos = zeros(m,m,N);
     
     for n_dx = 1 : N
        rhotemp = Psi(:,:,n_dx) * (Psi(:,:,n_dx))' ; 
        rhotemp =  A * rhotemp * A;
        rhotemp = rhotemp / trace(rhotemp); 
-       rho(:,:,n_dx) = rhotemp;
+       rhos(:,:,n_dx) = rhotemp;
     end
     

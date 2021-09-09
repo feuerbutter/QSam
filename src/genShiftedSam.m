@@ -6,15 +6,28 @@ function [rho,num_phys,Sigma] = genShiftedSam(N,rho_peak_shift_o,rho_peak_shift,
     % --------------------------------------------------------------------------
     % N : int
     %   # of sample points generated
-    % rho_peak : m*m array of complex
-    %   peak of the Wishart distribuion
-    % n_w : int
+    % rho_peak_shift_o : array of complex double
+    %   peak of the shifted sample before shifting
+    % rho_peak_shift : array of complex double
+    %   the final peak of the shifted sample
+    % n_s : int
     %   # of columns of the Psi matrices in constructing the density
     %   matrices
     % 
     % Output
     % --------------------------------------------------------------------------
+    % rhos : 3d array of comnplex double
+    %   sample points in the state space
+    % num_phys : int
+    %   # of physical states in the shifted reference sample
+    % Sigma : array of double
+    %   the covariance matrix required to produce the shifted Wishart sample
     % 
+    % 
+    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % see genRefSam.m
     % 
     % 
     % 

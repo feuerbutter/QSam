@@ -17,9 +17,8 @@ function [log_tar_prob,prob_points] = calTarProb(rhos,pop,pom)
     % --------------------------------------------------------------------------
     % log_tar_prob : 1d array of real double
     %   log of target probabilities of the sample
-    % prob_points : 3d array of complex double
-    %   sample points in the probability space, e.g. a 2-qubit sample of 1000 points would
-    %   have the dimension of 4x4x1000
+    % prob_points : 2d array of complex double 
+    %   sample points in the probability space
     % 
     % How to call
     % --------------------------------------------------------------------------

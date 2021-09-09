@@ -1,4 +1,4 @@
-function rho = genUniSam(N,m)
+function rhos = genUniSam(N,m)
     % 
     % This generates a uniform sample in m dimension with N points.
     % 
@@ -12,7 +12,14 @@ function rho = genUniSam(N,m)
     % 
     % Output
     % --------------------------------------------------------------------------
+    % rhos : 3d array of comnplex double
+    %   sample points in the state space
     % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % N = 1e4;
+    % m = 4;
+    % rhos = genUniSam(N,m);
     % 
     % 
     % 
@@ -21,7 +28,7 @@ function rho = genUniSam(N,m)
     Psi_imag = randn([m,m,N]); 
     Psi = Psi_real + 1j * Psi_imag;
     
-    rho = zeros(m,m,N);
+    rhos = zeros(m,m,N);
 
     for n_dx = 1 : N
        rhotemp = Psi(:,:,n_dx)*(Psi(:,:,n_dx))' ; 

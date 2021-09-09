@@ -1,21 +1,40 @@
 function [prob_points_accepted,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kappa_s,n_s,lambso,lambs)
     % 
-    % This generates the reference sample and the corresponding
-    % probability.
+    % This generates the target sample acoording to the target poterior with a specified reference sample
     % 
     % 
     % Input
     % --------------------------------------------------------------------------
     % N_total : int
     %   # of sample points generated
-    % n_qubit : int
-    %   number of qubits
-    % varargin : arrays of complex
-    %   POM is supplied as an optional variable
+    % pop : array of integers
+    %   the power of probabilities for the posterior
+    % kappa_w : real
+    %   percentage of Wishart reference sample in the total reference sample
+    % n_w : int
+    %   # of columns of the Psi matrix used in construction of the Wishart sample
+    % lambp : real
+    %   the 'distance' between the origin and the Wishart ref peak
+    % kappa_s : real
+    %   percentage of shifted reference sample in the total reference sample
+    % n_s : int
+    %   # of columns of the Psi matrix used in construction of the shifted sample
+    % lambso : real
+    %   the 'distance' between the origin and the ref peak before linear shift
+    % lambs : real
+    %   to which place the ref sample is shifted, 1 being MLE, 0 being origin
     % 
     % 
     % Output
     % --------------------------------------------------------------------------
+    % prob_points_accepted : 2d array of complex double (dimension : m^2 x N)
+    %   desired sample points in the probability space, distributed according to the target posterior 
+    % ar : real
+    %   acceptance rate
+    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % see main.m
     % 
     % 
     % 
