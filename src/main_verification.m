@@ -44,27 +44,14 @@ lambp = 0.95; %the 'distance' between the origin and the Wishart ref peak,
 %% Sampling Procedure
 
 %--- MLE
-np = m^2;
-ref_freq = pop/sum(pop);
+rho_mle = getRhoMLE(pop,pom);
 
-rho_peak = prob2Rho(ref_freq,pom);
-v = eig(rho_peak);
+rho_peak = lambp*rho_mle+(1-lambp)*eye(m)/m;   
+ppeak = rho2Prob(rho_mle,pom)';
+%-- o. peak for the shifted ref
+rho_peak_shift_o = rho_mle*lambso+(1-lambso)*eye(m)/m;
+rho_peak_shift = rho_mle*lambs+(1-lambs)*eye(m)/m;
 
-if sum(v<0)
-    fprintf('linear inversion not physical, mle running \n');
-    rhomle = qse_apg(pom,ref_freq');
-    fprintf('mle done \n');
-    rho_peak = lambp*rhomle+(1-lambp)*eye(m)/m;   
-    ppeak = rho2Prob(rhomle,pom)';
-    %-- o. peak for the shifted ref
-    rho_peak_shift_o = rhomle*lambso+(1-lambso)*eye(m)/m;
-    rho_peak_shift = rhomle*lambs+(1-lambs)*eye(m)/m;
-else
-    rho_peak_shift_o = rho_peak*lambso+(1-lambso)*eye(m)/m;
-    rho_peak_shift = rho_peak*lambs+(1-lambs)*eye(m)/m; 
-    ppeak = rho2Prob(rho_peak,pom)';
-end  
-    
 logLpeak = sum(pop.*log(ppeak));
 %-----Plotting
 log_lambda_step = 0.01;
@@ -78,7 +65,6 @@ prob_points_uniform = rho2Prob(rho_u,pom);
 size_lambda = calCred(pop,prob_points_uniform,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda);
 cred_from_size = calCredFromSize(size_lambda,log_lambda_step,min_log_lambda,max_log_lambda);
 cred_lambda = calCred(pop,prob_points_accepted,logLpeak,log_lambda_step,min_log_lambda,max_log_lambda);
-cred_py = calCred(pop,prob_points_phys',logLpeak,log_lambda_step,min_log_lambda,max_log_lambda);
 
 %------Plotting for verification
 plotCS(cred_from_size,log_lambda_step,min_log_lambda,max_log_lambda)

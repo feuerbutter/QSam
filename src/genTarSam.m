@@ -69,26 +69,13 @@ function [prob_points_accepted,ar] = genTarSam(N_total,pop,kappa_w,n_w,lambp,kap
     end
     
     %--- MLE
-    ref_freq = pop / sum(pop); % relative frequency
-    % linear inversion from probability to rho
-    rho_peak = prob2Rho(ref_freq,pom);     
-    % to check if the linearly inverted rho is physical
-    v = eig(rho_peak);
+    rho_mle = getRhoMLE(pop,pom);
 
-    if sum(v<0)
-        fprintf('linear inversion not physical, mle running \n');
-        rhomle = qse_apg(pom,ref_freq');
-        fprintf('mle done \n');
-        rho_peak = lambp*rhomle+(1-lambp)*eye(m)/m;   
-        ppeak = rho2Prob(rhomle,pom)';
-        %-- o. peak for the shifted ref
-        rho_peak_so = rhomle*lambso+(1-lambso)*eye(m)/m;
-        rho_peak_s = rhomle*lambs+(1-lambs)*eye(m)/m;
-    else
-        rho_peak_so = rho_peak*lambso+(1-lambso)*eye(m)/m;
-        rho_peak_s = rho_peak*lambs+(1-lambs)*eye(m)/m; 
-        ppeak = rho2Prob(rho_peak,pom)';
-    end  
+    rho_peak = lambp*rho_mle+(1-lambp)*eye(m)/m;   
+    ppeak = rho2Prob(rho_mle,pom)';
+    %-- o. peak for the shifted ref
+    rho_peak_shift_o = rho_mle*lambso+(1-lambso)*eye(m)/m;
+    rho_peak_shift = rho_mle*lambs+(1-lambs)*eye(m)/m;
     
     % log of likelihood of the maximum likelihood estimator
     logLpeak = sum(pop.*log(ppeak));
