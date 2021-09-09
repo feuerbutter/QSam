@@ -17,7 +17,14 @@ function rho = prob2Rho(prob,POM)
     % rho : array of complex double
     %   density matrices
     % 
-    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % pom = buildTetraPOM();
+    % m = 2;
+    % N_total = 10;
+    % rhos = genUniSam(N_total,m)
+    % prob = rho2Prob(rhos,pom)
+    % rhos = prob2rho(prob,pom)
     % 
 
     % Flatten POM

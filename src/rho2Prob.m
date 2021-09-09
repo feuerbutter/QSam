@@ -16,7 +16,13 @@ function prob = rho2Prob(rho,POM)
     % prob : array of real double
     %   observation probabilities
     % 
-    % 
+    % How to call
+    % --------------------------------------------------------------------------
+    % pom = buildTetraPOM();
+    % m = 2;
+    % N_total = 10;
+    % rhos = genUniSam(N_total,m)
+    % prob = rho2Prob(rhos,pom)
     % 
 
     % Flatten POM
