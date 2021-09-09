@@ -25,7 +25,8 @@ or
 2. sth
 
 ## Running of Codes
-To generate a sample, one only needs to supply the appropriate parameters in the script, *main.m*. One needs to adjust the various properties of the reference sample, such as the composition percentage of the Wishart sample, and to specify the posterior for the target sample. The target sample points are then collected in the variable *prob_points_accepted* and the acceptance rate is given in thevariable in *ar*. 
+### Generation of a target sample
+To generate a sample, one only needs to supply the appropriate parameters in the script, *main.m*. One needs to adjust the various properties of the reference sample, such as, *kappa_w*, the composition percentage of the Wishart sample, and to specify, *pop*, the posterior for the target sample. The target sample points are then collected in the variable *prob_points_accepted* and the acceptance rate is given in thevariable in *ar*. 
 
 One is advised to first begin with a relatively small *N_total*, e.g. 1e4 or 1e5, and play with the reference sample parameters to achieve a considerably efficient acceptance rate before generating a large target sample.
 
@@ -33,6 +34,8 @@ The sample produced is probabilities in the probability simplex, and it could be
 ```
 rho = prob2Rho(prob,POM)
 ```
+### Verification of the produced sample
+To verify that the target sample produced indeed follows the target distrbution, one could run the script, *main_verification.m*. It is only possible for low dimension where the size of the sample could be aproximated accurately with a practically sized uniform sample to calculate the posterior theoretically.
  
 ## Utility Functions
 - genRefSam : used to generate reference sample
